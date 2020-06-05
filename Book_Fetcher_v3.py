@@ -42,23 +42,26 @@ def Scrape_Books():
             next_butn = soup.find(class_="next")
             url = next_butn.find("a")["href"] if next_butn else None
             cnt += 1
+            sleep(2)
 
 
 def save_books(all_books):
     run_query(
-        "INSERT OR REPLACE INTO books(title,price,category,rating) VALUES (?,?,?,?);",
+        '''INSERT OR REPLACE INTO books(title,price,category,rating)
+           VALUES (?,?,?,?);''',
         all_books)
 
 
 def setup_db():
     path = str(pathlib.Path(__file__).parent.absolute())
     path = path + db
-    #path = r"L:\\Udemy\\python_bootcamp\\{}".format(db)
+    # path = r"L:\\Udemy\\python_bootcamp\\{}".format(db)
     if not os.path.isfile(path):
         print("Creating Database")
         open(db, 'w').close()
         run_query(
-            "CREATE TABLE books(title TEXT,price REAL,category TEXT,rating INTEGER)")
+            '''CREATE TABLE books(title TEXT,price REAL
+            ,category TEXT,rating INTEGER)''')
         run_query("CREATE UNIQUE INDEX idx_title ON books(title)")
         print("Database Sucessfully Created")
 
@@ -83,7 +86,6 @@ def run_query(query, values=None):
     connection = sqlite3.connect(db)
     c = connection.cursor()
     if values:
-        import types
         if not isinstance(values, str):
             c.executemany(query, values)
             print(f"Executing MANY:{query}")
